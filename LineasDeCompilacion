@@ -1,0 +1,124 @@
+<FLAGS> == -Wall -Werror -Wextra -pedantic -std=c99
+
+PASOS PARA COMPILAR:
+1ª) 
+$ gcc -c <flags> min_max.c
+2)
+$ gcc -o mi_programa <flags> min_max.o
+
+==================================================================================================
+
+EJECUCION DE GDB:
+$ gcc <FLAGS> -g -c main.c matchTimeline.c
+$ gcc <FLAGS> -g -o matchTimeline main.o matchTimeline.o
+$ gdb --args ./matchTimeline
+
+==================================================================================================
+
+EJEMPLO DE MAKEFILE:
+CC = gcc
+CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99 -g
+SOURCES = main.c matchTimeline.c
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = matchTimeline
+
+.PHONY: clean
+
+all: $(TARGET)
+
+test: $(TARGET)
+	./$(TARGET)
+
+valgrind: $(TARGET)
+	valgrind --error-exitcode=2 --leak-check=full ./$(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LFLAGS) $(LIBS)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	$(RM) $(OBJECTS) $(TARGET)
+
+gdb: $(TARGET)
+	gdb --args ./$(TARGET)
+
+
+PARA BUSCAR INFORMACION DE FUNCIONES: $ man "name Funcintion"
+
+==================================================================================================
+
+COMPRIMIR:                         |  DESCOMPRIMIR:			|  Ver contenido:
+tar -czf archivo.tar.gz archivos   |  tar -xvzf archivo.tar.gz	|  tar -tzf archivo.tar.gz
+
+==================================================================================================
+
+MOVER UN ARCHIVO:
+$ mv ARCHIVO_ORIGEN  ARCHIVO_FINAL
+ejemplo:
+En Descargas tenemos los archivos: ... lab01.pf lab01.tar.gz ...
+Nos posicionamos en el directorio Descargas:
+$ cd Descargas
+
+Ahora movemos el archivo al directorio destino:
+-/Descargas$ mv lab01.tar.gz ../Escritorio/Algo2
+
+Ahora verificamos si esta en dicho directorio:
+-/Descargas$ ls ../Escritorio/Algo2
+lab0  LAB00_ARMANDO_CARRAL.tar.gz  lab01.tar.gz  lab0-enunciado.pdf  ""lab0.tar.gz""  LineasDeCompilacion
+
+==================================================================================================
+NOTAS:
+sizeof():
+        Para asignar un bloque de memoria dinámicamente. 
+        sizeof se usa mucho en la asignación de memoria dinámica. Por ejemplo, si queremos asignar memoria para que sea suficiente para contener 10 enteros 
+        y no sabemos el tamaño de (int) en esa máquina en particular. Podemos asignar con la ayuda de sizeof.
+		Ejemplo de asignacion:
+        int* ptr = (int*) malloc(10 * sizeof(int));
+
+YO:
+array = malloc((size_t)size * sizeof(int));
+con esto " (size_t)size * " reservo la cantidad necesaria para contener los elementos sino sabemos el tamaño de (int).
+
+/* 
+	En C existen dos funciones que reservan la cantidad de memoria deseada en tiempo de ejecucion.
+	Dichas funciones devuelve un puntero al inicio de la zona de memoria reservada.
+	Esas funciones son malloc y calloc , y sus declaraciones, estan en la libreria "stdlib.h"
+    	void *malloc(int n_bytes);
+    	void *calloc(int n_datos, int tamaño_datos);
+
+    En Malloc se señala unicamente 
+    - la cantidad de bytes del espacio que quiere reservarse:
+    	void *malloc(int n_bytes);
+    malloc: numero de bytes total
+
+    En Calloc se indica:
+    - La cantidad de elementos deseados en ese espacio: "int n_datos"
+    - Y el tamaño en bytes de cada elemento:            "int tamaño_datos"
+    	void *calloc(int n_datos, int tamaño_datos);
+    	calloc: cantidad de elementos * bytes por elementos 
+    Además, calloc inicaliza todos los bits del espacio reservado a cero.
+
+    (int *) "malloc o calloc" (...);   //(int *) es el type-casting.
+
+    void *calloc(size_t nmemb, size_t size);
+    If "nmemb" or "size" is 0, then calloc() returns either NULL, or a unique pointer value that can later be successfully passed to free().
+    Si "nmemb" o "size" es 0, entonces calloc() devuelve o bien NULL, o bien un valor de puntero único que más tarde puede pasarse con éxito a free().
+
+    En Realloc():
+    void *realloc(void *ptr, size_t size);
+    "ptr" − Representa un puntero a un bloque de memoria para ser reasignado. Eso es asignado previamente por el 'malloc()', 'calloc()' y 'realloc()'.
+
+    "size" − Representa el nuevo tamaño para el bloque de memoria, en bytes. Si el tamaño es cero, el puntero no es nulo. Se asigna un nuevo objeto de tamaño mínimo, el objeto original se liberará.
+
+    Valor de retorno
+    Esta función devuelve un puntero a la memoria recién asignada. 
+    En caso contrario 'NULL' si la función no consigue asignar el bloque 
+    de memoria solicitado.
+
+    Cuando se intente agregar un elemento y el arreglo se encuentre lleno (size == capacity) debe pedirse más memoria para elems usando
+    la función realloc(). Para no hacer demasiadas realocaciones de memoria, no conviene pedir espacio solo para el nuevo 
+    elemento sino que es recomendable pedir para el doble de 
+    la capacidad actual.
+*/
